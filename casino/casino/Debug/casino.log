@@ -1,0 +1,14 @@
+﻿  BlackJack.cpp
+c:\users\blake\documents\cpp\casino\casino\blackjack.cpp(32): warning C4018: '<' : signed/unsigned mismatch
+c:\users\blake\documents\cpp\casino\casino\blackjack.cpp(33): warning C4018: '<' : signed/unsigned mismatch
+c:\users\blake\documents\cpp\casino\casino\blackjack.cpp(44): warning C4018: '<' : signed/unsigned mismatch
+c:\users\blake\documents\cpp\casino\casino\blackjack.cpp(141): warning C4101: 's' : unreferenced local variable
+c:\users\blake\documents\cpp\casino\casino\blackjack.cpp(199): warning C4018: '<' : signed/unsigned mismatch
+c:\users\blake\documents\cpp\casino\casino\blackjack.cpp(211): warning C4018: '<' : signed/unsigned mismatch
+c:\users\blake\documents\cpp\casino\casino\blackjack.cpp(242): warning C4018: '<' : signed/unsigned mismatch
+c:\users\blake\documents\cpp\casino\casino\blackjack.cpp(246): warning C4018: '<' : signed/unsigned mismatch
+c:\users\blake\documents\cpp\casino\casino\blackjack.cpp(292): warning C4018: '<' : signed/unsigned mismatch
+c:\users\blake\documents\cpp\casino\casino\blackjack.cpp(293): warning C4018: '<' : signed/unsigned mismatch
+c:\users\blake\documents\cpp\casino\casino\blackjack.cpp(303): warning C4018: '<' : signed/unsigned mismatch
+c:\users\blake\documents\cpp\casino\casino\blackjack.cpp(269): warning C4715: 'BlackJack::determineCardValue' : not all control paths return a value
+  casino.vcxproj -> C:\Users\Blake\Documents\cpp\casino\Debug\blackJack.exe

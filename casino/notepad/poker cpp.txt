@@ -1,0 +1,377 @@
+#include "Poker.h"
+#include <algorithm>
+#include <iostream>
+
+Poker::Poker()
+:Deck()
+{
+	
+	getPlayers();
+	interface();
+	
+}
+Poker::~Poker(){}
+void Poker::interface(){
+	int choice = 1;
+
+	while (choice == 1){
+		choice = 0;
+
+		deal();
+		printHand();
+		takeBets();
+		dealOne();
+		dealOne();
+		dealOne();
+		cout << "Flop: " << endl << endl;
+		printSharedCards();
+		takeBets();
+		dealOne();
+		cout << "Turn: " << endl << endl;
+		printSharedCards();
+		takeBets();
+		dealOne();
+		cout << "River: " << endl << endl;
+		printSharedCards();
+		takeBets();
+
+		cout << "\nPlay again? (1 = yes, any key for no)" << endl;
+		cin >> choice;
+
+		reset();
+	}
+}
+void Poker::setPlayerRanks(){
+	string face[] = { "Ace" ,"2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King"};
+	int value[] = { 1,2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13};
+
+	//for (int i = 0; i < numPlayers; i++){
+		
+		//for (int j = 0; j < people.at(0).hand2.size(); j++){
+			
+			//if(people.at(i).hand2.at(j).getMyFace == "Ace"){
+				//ranks.at(i).at(j) = 1;
+			//}
+			//else if (people.at(i).hand2.at(j).getMyFace == "2"){
+				//ranks.at(i).at(j) = 2;
+			//}
+			//else if (people.at(i).hand2.at(j).getMyFace == "3"){
+				//ranks.at(i).at(j) = 3;
+			//}
+			//else if (people.at(i).hand2.at(j).getMyFace == "4"){
+				//ranks.at(i).at(j) = 4;
+			//}
+
+
+		//}
+	//}
+
+	for (int i = 0; i < numPlayers; i++){
+		
+		for (int j = 0; j < people.at(0).hand2.size(); j++){
+			
+			for (int k = 0; k < 13; k++){
+				
+				if (people.at(i).hand2.at(j).getMyFace() == face[k]){
+					ranks.at(i).at(j) = value[k];
+				}
+				
+				}
+			}
+		}
+
+	for (int s = 0; s < ranks.size(); s++){
+		sort(ranks.at(s).begin(), ranks.at(s).end());
+	}
+}
+int Poker::setHand(int a){
+	
+	int hold = 0,pair = 0,threeofkind=0,fourofkind=0,flush = 0;
+	int counter1 = 0, counter2 = 0, counter3 = 0,straight = 0,straight2 = 0;
+	
+		
+		for (int i = 0; i < people.at(0).hand2.size(); i++){
+			for (int j = 1; j < people.at(0).hand2.size(); j++){
+				if (people.at(a).hand2.at(i).getMyFace() == people.at(a).hand2.at(j).getMyFace()){
+					hold++;
+				}
+				if (people.at(a).hand2.at(i).getMySuit() == people.at(a).hand2.at(j).getMySuit()){
+					flush++;
+				}
+			}
+			switch (hold){
+			case 1:
+				pair++;
+				hold = 0;
+				break;
+			case 2:
+				threeofkind++;
+				hold = 0;
+				break;
+			case 3:
+				fourofkind++;
+				hold = 0;
+				break;
+			}
+		}
+		//check for straight
+		for (int i = 0; i < 4; i++){
+			if (ranks.at(a).at(i + 1) == (ranks.at(a).at(i) + 1)){
+				counter1++;
+			}
+		}
+		for (int j = 1; j < 5; j++){
+			if (ranks.at(a).at(j + 1) == (ranks.at(a).at(j) + 1)){
+				counter2++;
+			}
+		}
+		for (int k = 2; k < 6; k++){
+			if (ranks.at(a).at(k + 1) == (ranks.at(a).at(k) + 1)){
+				counter3++;
+			}
+		}
+	
+		if (counter1 == 4 || counter2 == 4 || counter3 == 4){
+			straight = 1;
+		}
+		if (counter3 == 3 && ranks.at(a).at(0) == 1){
+			straight2 = 1;
+		}
+		//do return for whatever hand they have
+		if (straight2 == 1 && flush >= 4){
+			return 10;
+		}
+		else if ((straight == 1 || straight2 == 1) && flush <= 4){
+			return 9;
+		}
+		else if (fourofkind >= 1){
+			return 8;
+		}
+		else if (threeofkind >= 1 && pair == 2){
+			return 7;
+		}
+		else if (flush >= 1){
+			return 6;
+		}
+		else if (straight == 1 || straight2 == 1){
+			return 5;
+		}
+		else if (threeofkind >= 1){
+			return 4;
+		}
+		else if (pair == 2){
+			return 3;
+		}
+		else if (pair == 1){
+			return 2;
+		}
+		else{
+			return 0;
+		}
+
+}
+void Poker::getPlayers(){
+	cout << "How many players? Choose between 2-8" << endl;
+	cin >> numPlayers;
+
+	while (numPlayers > 8 || numPlayers < 1){
+		cout << "Invalid number of players, choose betwen 2-8" << endl;
+		cin >> numPlayers;
+	}
+	
+	people.resize(numPlayers);
+}
+void Poker::deal(){
+	cout << "Dealing Cards..." << endl << endl;
+	for (int i = 0; i < numPlayers; i++){
+		for (int j = 0; j < 2; j++){
+			people.at(i).hand2.push_back(deck[deckCount]);
+			deckCount++;
+		}
+	}
+	//resets playerBets to zero and playHand to 1
+	for (int i = 0; i < numPlayers; i++){
+		highestBet = 0;
+		people.at(i).playerBet = 0;
+		people.at(i).setPlayHand(1);
+		people.at(i).betting = 0;
+	}
+}
+void Poker::printHand(){
+	for (int i = 0; i < numPlayers; i++){
+
+		cout << "Player " << i + 1 << "'s " << "hand is.." << endl;
+
+		for (int j = 0; j < 2; j++){
+			cout << people.at(i).hand2.at(j);
+		}
+		cout << "\n";
+	}
+}
+void Poker::takeBets(){
+	int bet = 0, errorCheck = 0, highest, choice, temp = 0;
+	stillBetting = -1;
+	for (int i = 0; i < numPlayers; i++){
+		highestBet = 0;
+		people.at(i).playerBet = 0;
+		people.at(i).betting = 0;
+	}
+	while (stillBetting != 0){
+		for (int i = 0; i < numPlayers; i++){
+			if (people.at(i).getPlayHand() >= 4){
+				people.at(i).betting = 0;
+			}
+			if (people.at(i).getPlayHand() < 4){
+				cout << people.at(i).getPlayHand() << "hereeeee" << endl;
+				
+				cout << "Player " << i + 1 << " check (1), call (2), raise (3), fold (4), all in (5)" << endl;
+				cin >> choice;
+				people.at(i).setPlayHand(choice);
+				
+				if (choice == 1)
+					check(i);
+				if (choice == 2)
+					call(i);
+				if (choice == 3)
+					raise(i);
+				if (choice == 4)
+					fold(i);
+				if (choice == 5)
+					allIn(i);
+				cout << "Pot: " << pot << endl << endl;
+				choice = 0;
+			}
+		}
+		for (int j = 0; j < numPlayers; j++){
+			temp += people.at(j).betting;
+		}
+		stillBetting = temp;
+//		cout << stillBetting << " " << temp << endl;
+		temp = 0;
+	}
+}
+void Poker::dealOne()
+{
+	for (int i = 0; i < numPlayers; i++){
+		people.at(i).hand2.push_back(deck[deckCount]);
+		deckCount++;
+	}
+}
+void Poker::call(int player){
+//	cout << highestBet << " " << people.at(player).playerBet << " " << people.at(player).getBankRoll() << endl;
+//	cout << people.at(player).getBankRoll() << " " << highestBet - people.at(player).playerBet << endl;
+//	pot += 1000;
+	if ((highestBet > people.at(player).playerBet) && people.at(player).getPlayHand() != 4 
+		&& people.at(player).getBankRoll() > highestBet - people.at(player).playerBet){
+		people.at(player).setBet(highestBet - people.at(player).playerBet);
+		pot += highestBet - people.at(player).playerBet;
+		people.at(player).playerBet += highestBet - people.at(player).playerBet;
+		people.at(player).setPlayHand(2);
+		people.at(player).betting = 0;
+		
+		cout << "Player " << player + 1 << " called" << endl << endl;
+	}
+	else if  (people.at(player).getBankRoll() <= (highestBet - people.at(player).playerBet)){
+		pot += people.at(player).getBankRoll();
+		people.at(player).setBankRoll(0);
+
+		cout << "Player " << player + 1 << " called and is all in!" << endl << endl;
+	}
+}
+void Poker::raise(int player)
+{
+	int raise = -1, error = 0;
+	if (people.at(player).getPlayHand() < 4 && people.at(player).getBankRoll() > 0){
+		while (error != 1 && raise < highestBet){
+			cout << "Enter amount to raise (must be > " << highestBet << " and <= current bank: " << people.at(player).getBankRoll()
+				<< ")"<< endl;
+			cin >> raise;
+			//check if raise is > current bet
+			if (raise > highestBet - people.at(player).playerBet){
+				error = people.at(player).setBet(raise);
+			}
+			if (error == 1){
+				people.at(player).playerBet += raise;
+				pot += raise;
+				people.at(player).setPlayHand(3);
+				people.at(player).betting = 1;
+				cout << "Player " << player + 1 << " raised $" << raise - highestBet << endl << endl;
+				if (people.at(player).playerBet > highestBet){
+					highestBet += raise - highestBet;
+				}
+			}
+		}
+	}
+	else{
+		cout << "Not enough $$ to raise, player " << player + 1 << " checked" << endl << endl;
+	}
+}
+void Poker::check(int player)
+{
+//	cout << people.at(player).getPlayHand() << " " << people.at(player).playerBet << " " << highestBet << endl;
+
+	int choice = 0;
+	if (people.at(player).getPlayHand() != 4){
+		if (people.at(player).playerBet == highestBet || people.at(player).getPlayHand() == 5){
+			cout << "Player " << player + 1 << " checked" << endl << endl;
+			people.at(player).setPlayHand(1);
+			people.at(player).betting = 0;
+		}
+		else{
+			while (choice == 1){
+				cout << "You can't check" << endl;
+
+				cout << "Player " << player + 1 << " call (2), raise (3), fold (4), all in (5)" << endl;
+				cin >> choice;
+//				cout << choice << endl;
+
+				if (choice == 2)
+					call(player);
+				if (choice == 3)
+					raise(player);
+				if (choice == 4)
+					fold(player);
+				if (choice == 5)
+					allIn(player);
+
+			}
+		}
+	}
+}
+void Poker::fold(int player)
+{
+	cout << "Player " << player + 1 << " folds" << endl << endl;
+//	people.at(player).playerBet = -1;
+	people.at(player).setPlayHand(4);
+	people.at(player).betting = 0;
+}
+void Poker::allIn(int player)
+{
+	people.at(player).playerBet += people.at(player).getBankRoll();
+	cout << "Player " << player + 1 << " has gone all in for " << people.at(player).getBankRoll() << endl << endl;
+	pot += people.at(player).getBankRoll();
+	highestBet += people.at(player).getBankRoll();
+	people.at(player).setBankRoll(0);
+	people.at(player).setPlayHand(5);
+	people.at(player).betting = 1;
+
+	
+}
+void Poker::printSharedCards()
+{
+	for (int i = 2; i < people.at(0).hand2.size(); i++){
+		cout << people.at(0).hand2.at(i) << endl;
+	}
+	cout << endl;
+}
+void Poker::reset()
+{
+	for (int i = 0; i < ranks.size(); i++){
+		ranks.at(i).clear();
+	}
+	for (int i = 0; i < numPlayers; i++){
+		people.at(i).hand2.clear();
+	}
+	pot = 0;
+
+}
